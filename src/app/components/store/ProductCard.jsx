@@ -46,10 +46,10 @@ export default function ProductCard({ product }) {
         <button
           type="button"
           onClick={quickAdd}
-          className="absolute bottom-3 left-3 right-3 flex translate-y-0 items-center justify-center gap-2 bg-[#075b54]/95 px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-white opacity-100 transition duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 focus:translate-y-0 focus:opacity-100"
+          className="absolute bottom-3 left-3 right-3 flex translate-y-0 items-center justify-center gap-2 rounded-full bg-[#173d38] px-4 py-3 text-[9px] uppercase tracking-[0.18em] text-white opacity-100 transition duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 focus:translate-y-0 focus:opacity-100"
         >
           <ShoppingBag size={14} />
-          {added ? "Added to bag" : "Quick add"}
+          {added ? "Added to bag" : "Buy now"}
         </button>
       </div>
       <div className="flex items-start justify-between gap-3 px-1 pt-4">

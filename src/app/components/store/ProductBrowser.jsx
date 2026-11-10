@@ -84,30 +84,6 @@ export default function ProductBrowser({ products, initialCategory = "All", init
 
   return (
     <>
-      <div className="mb-8 flex flex-col gap-6 border-b border-[#d8d1c4] pb-7 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8e7c60]">Shop the collection</p>
-          <h1 className="mt-3 font-albert-sans text-[clamp(2.1rem,4vw,3.3rem)] font-medium leading-none tracking-[-0.06em] text-[#173d38]">
-            New seasonal essentials
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-3 self-start lg:self-auto">
-          <label className="sr-only" htmlFor="product-sort">Sort products</label>
-          <select
-            id="product-sort"
-            value={sort}
-            onChange={(event) => setSort(event.target.value)}
-            className="rounded-full border border-[#d8d1c4] bg-white px-4 py-2.5 text-sm text-[#173d38] outline-none transition focus:border-[#173d38]"
-          >
-            <option value="featured">Featured</option>
-            <option value="price-low">Price: low to high</option>
-            <option value="price-high">Price: high to low</option>
-            <option value="name">Name</option>
-          </select>
-        </div>
-      </div>
-
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="rounded-[28px] border border-[#e4dccb] bg-[#fbfaf6] p-4 shadow-[0_8px_24px_rgba(23,61,56,0.04)]">
           <div className="flex items-center justify-between gap-3 pb-4">
