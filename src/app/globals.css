@@ -19,6 +19,93 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
+.benefits-marquee {
+  position: relative;
+}
+
+.benefits-marquee::before,
+.benefits-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.benefits-marquee::before {
+  left: 0;
+  background: linear-gradient(to right, #f7f4ed, rgba(247, 244, 237, 0));
+}
+
+.benefits-marquee::after {
+  right: 0;
+  background: linear-gradient(to left, #f7f4ed, rgba(247, 244, 237, 0));
+}
+
+.benefits-track {
+  animation: benefits-scroll 20s linear infinite;
+  will-change: transform;
+}
+
+.benefits-marquee:hover .benefits-track {
+  animation-play-state: paused;
+}
+
+.promo-marquee {
+  position: relative;
+  isolation: isolate;
+}
+
+.promo-marquee::before,
+.promo-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.promo-marquee::before {
+  left: 0;
+  background: linear-gradient(to right, #dfe65d, rgba(223, 230, 93, 0));
+}
+
+.promo-marquee::after {
+  right: 0;
+  background: linear-gradient(to left, #dfe65d, rgba(223, 230, 93, 0));
+}
+
+.promo-track {
+  animation: promo-scroll 18s linear infinite;
+  will-change: transform;
+}
+
+.promo-marquee:hover .promo-track {
+  animation-play-state: paused;
+}
+
+@keyframes benefits-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes promo-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 h1,
 h2,
 h3,

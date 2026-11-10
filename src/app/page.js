@@ -6,6 +6,13 @@ import HomepageProductSection from "@/components/home/HomepageProductSection";
 import { products } from "@/data/products";
 import { categories } from "@/data/categories";
 
+const features = [
+  { label: "7-day exchanges", Icon: RefreshCw },
+  { label: "New-season styles", Icon: Sparkles },
+  { label: "Free delivery over ৳3,000", Icon: Truck },
+  { label: "Easy 7-day return", Icon: RefreshCw },
+];
+
 export default function HomePage() {
   const offer = products.find((product) => product.compareAtPrice);
   const discount = offer
@@ -15,25 +22,6 @@ export default function HomePage() {
   return (
     <div className="bg-white">
       <HomeHeroCarousel offerPercent={discount} />
-
-      <section aria-label="AVRONE shopping benefits" className="border-y border-[#e6dfd2] bg-[#f7f4ed] text-[#173d38]">
-        <div className="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-[#ded6c8] px-3 sm:px-6 md:px-10 lg:px-12">
-          {[
-            { label: "New-season styles", Icon: Sparkles },
-            { label: "Free delivery over ৳3,000", Icon: Truck },
-            { label: "Easy 7-day exchanges", Icon: RefreshCw },
-          ].map(({ label, Icon }) => (
-            <div key={label} className="flex min-h-[76px] flex-col items-center justify-center gap-2 px-2 py-3 text-center sm:min-h-[68px] sm:flex-row sm:gap-3 sm:px-4 sm:py-4">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#b99458]/50 text-[#9b7c43]">
-                <Icon size={14} strokeWidth={1.6} />
-              </span>
-              <span className="max-w-[13rem] text-[8px] font-medium leading-4 tracking-[0.08em] sm:text-[9px] sm:tracking-[0.12em] md:text-[10px]">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <HomepageProductSection
         eyebrow="Fresh from the studio"
