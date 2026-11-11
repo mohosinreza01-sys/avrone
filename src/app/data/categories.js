@@ -13,6 +13,9 @@ export const categories = [
     name: "Women's Fashion",
     slug: "womens-fashion",
     description: "A new wardrobe is coming soon",
+    comingSoonMessage: "Our women's collection is on its way.",
+    comingSoonDetails:
+      "We're preparing a new collection for AVRONE. It's not available to shop yet, but you can explore the styles currently in store.",
     productCategories: [],
     comingSoon: true,
     image:
@@ -26,5 +29,18 @@ export const categories = [
     productCategories: ["Accessories"],
     image:
       "https://images.unsplash.com/photo-1711443982852-b3df5c563448?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: 4,
+    name: "Perfumes",
+    slug: "perfumes",
+    description: "Signature scents are coming soon",
+    comingSoonMessage: "Our perfume collection is on its way.",
+    comingSoonDetails:
+      "We're curating signature scents for AVRONE. Perfumes aren't available to order just yet, but you can browse our current collection while you wait.",
+    productCategories: [],
+    comingSoon: true,
+    image:
+      "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=900&q=80",
   },
 ];

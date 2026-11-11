@@ -30,7 +30,7 @@ export default function MobileShopNav() {
             href={href}
             aria-label={count ? `${label}, ${count} items` : label}
             aria-current={active ? "page" : undefined}
-            className={`relative flex flex-col items-center justify-center gap-1 text-[9px] uppercase tracking-[0.12em] ${
+            className={`relative flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-[0.08em] ${
               active ? "text-[#075b54]" : "text-[#68807a]"
             }`}
           >

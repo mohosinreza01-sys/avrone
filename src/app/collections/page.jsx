@@ -10,7 +10,7 @@ export default function CollectionsPage() {
     <div className="min-h-[65vh] bg-[#F8F7F4]">
       <h1 className="sr-only">AVRONE collections</h1>
       <section className="mx-auto max-w-7xl px-5 py-10 md:px-10 md:py-14 lg:px-12">
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 md:gap-5">
           {categories.map((category, index) => (
             <Link
               key={category.slug}
