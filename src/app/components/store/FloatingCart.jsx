@@ -13,7 +13,7 @@ export default function FloatingCart() {
   if (!cartCount || pathname === "/cart" || pathname === "/checkout") return null;
 
   return (
-    <aside className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-3 z-40 sm:right-5 md:bottom-5">
+    <aside className="fixed bottom-[calc(132px+env(safe-area-inset-bottom))] right-3 z-40 sm:right-5 md:bottom-20">
       <Link
         href="/cart"
         aria-label={`View bag, ${cartCount} ${cartCount === 1 ? "item" : "items"}, ${formatPrice(subtotal)}`}

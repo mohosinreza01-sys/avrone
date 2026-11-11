@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MobileShopNav from "@/components/layout/MobileShopNav";
 import FloatingCart from "@/components/store/FloatingCart";
+import WhatsAppChat from "@/components/layout/WhatsAppChat";
 
 export default function SiteChrome({ children }) {
   const isAdmin = usePathname().startsWith("/admin");
@@ -22,6 +23,7 @@ export default function SiteChrome({ children }) {
       {!isAdmin && (
         <>
           <FloatingCart />
+          <WhatsAppChat />
           <Footer />
           <MobileShopNav />
         </>
