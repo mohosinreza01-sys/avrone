@@ -4,9 +4,10 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { useRef } from "react";
 import ProductCard from "@/components/store/ProductCard";
+import { useStore } from "@/components/store/StoreProvider";
 
 export default function HomepageProductSection({
-  products,
+  products: initialProducts,
   eyebrow,
   title,
   description,
@@ -16,6 +17,10 @@ export default function HomepageProductSection({
 }) {
   const dark = tone === "dark";
   const productTrack = useRef(null);
+  const { catalog, catalogLoaded } = useStore();
+  const products = catalogLoaded
+    ? catalog.filter((product) => product.active && product.badge === "New").slice(0, 8)
+    : initialProducts;
 
   function scrollProducts(direction) {
     if (!productTrack.current) return;

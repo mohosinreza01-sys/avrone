@@ -1,8 +1,9 @@
 "use client";
 
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/store/ProductCard";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 const productFilters = [
   { label: "All pieces", value: "" },
@@ -18,7 +19,9 @@ const getSizeOrder = (size) => {
   return order[size] ?? 99;
 };
 
-export default function ProductBrowser({ products, initialCategory = "All", initialQuery = "", initialFilter = "" }) {
+export default function ProductBrowser({ products: initialProducts, initialCategory = "All", initialQuery = "", initialFilter = "", categoryFilter = null }) {
+  const [products, setProducts] = useState(initialProducts);
+  const [catalogError, setCatalogError] = useState("");
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState("featured");
   const [query, setQuery] = useState(initialQuery);
@@ -27,10 +30,33 @@ export default function ProductBrowser({ products, initialCategory = "All", init
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
 
-  const categories = ["All", ...new Set(products.map((product) => product.category))];
-  const colors = [...new Set(products.map((product) => product.color))];
-  const brands = [...new Set(products.map((product) => product.brand))];
-  const sizes = [...new Set(products.flatMap((product) => product.sizes))].sort((a, b) => getSizeOrder(a) - getSizeOrder(b));
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    const controller = new AbortController();
+    fetch("/api/products", { signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not refresh the catalog.");
+        if (!Array.isArray(data.products)) throw new Error("The catalog response is invalid.");
+        setProducts(data.products);
+        setCatalogError("");
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          setCatalogError(error.message);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const scopedProducts = categoryFilter?.length
+    ? products.filter((product) => categoryFilter.includes(product.category))
+    : products;
+  const categories = ["All", ...new Set(scopedProducts.map((product) => product.category))];
+  const colors = [...new Set(scopedProducts.map((product) => product.color))];
+  const brands = [...new Set(scopedProducts.map((product) => product.brand))];
+  const sizes = [...new Set(scopedProducts.flatMap((product) => product.sizes))].sort((a, b) => getSizeOrder(a) - getSizeOrder(b));
 
   const toggleArrayValue = (value, setValue) => {
     setValue((current) =>
@@ -49,7 +75,7 @@ export default function ProductBrowser({ products, initialCategory = "All", init
 
   const visibleProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const filtered = products.filter((product) => {
+    const filtered = scopedProducts.filter((product) => {
       const matchesCategory = category === "All" || product.category === category;
       const matchesQuery =
         !normalizedQuery ||
@@ -72,7 +98,7 @@ export default function ProductBrowser({ products, initialCategory = "All", init
     if (sort === "price-high") return [...filtered].sort((a, b) => b.price - a.price);
     if (sort === "name") return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     return filtered;
-  }, [category, filter, products, query, selectedBrands, selectedColors, selectedSizes, sort]);
+  }, [category, filter, query, scopedProducts, selectedBrands, selectedColors, selectedSizes, sort]);
 
   const hasActiveFilters =
     category !== "All" ||
@@ -84,6 +110,11 @@ export default function ProductBrowser({ products, initialCategory = "All", init
 
   return (
     <>
+      {catalogError && (
+        <p role="status" className="mb-5 rounded-lg border border-[#ead9b9] bg-[#fbf7ed] px-4 py-3 text-xs text-[#684d22]">
+          Could not refresh the live catalog ({catalogError}). Showing the saved preview products.
+        </p>
+      )}
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="rounded-[28px] border border-[#e4dccb] bg-[#fbfaf6] p-4 shadow-[0_8px_24px_rgba(23,61,56,0.04)]">
           <div className="flex items-center justify-between gap-3 pb-4">

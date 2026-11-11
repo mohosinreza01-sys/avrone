@@ -2,22 +2,49 @@
 
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { useCallback, useSyncExternalStore } from "react";
 import { formatPrice } from "@/data/products";
 import { useStore } from "@/components/store/StoreProvider";
 
+let cachedConfirmation = null;
+let cachedConfirmationRaw = null;
+
+function getConfirmationSnapshot(orderId) {
+  if (typeof window === "undefined") return null;
+  const raw = window.sessionStorage.getItem("avrone-last-order");
+  if (raw !== cachedConfirmationRaw) {
+    cachedConfirmationRaw = raw;
+    cachedConfirmation = null;
+    if (raw) {
+      try {
+        cachedConfirmation = JSON.parse(raw);
+      } catch (error) {
+        console.error("Could not restore the order confirmation in this browser.", error);
+      }
+    }
+  }
+  return cachedConfirmation?.id === orderId ? cachedConfirmation : null;
+}
+
+function subscribeToConfirmation() {
+  return () => {};
+}
+
 export default function OrderConfirmation({ orderId }) {
   const { orders, ready } = useStore();
-  const order = orders.find((item) => item.id === orderId);
+  const getSnapshot = useCallback(() => getConfirmationSnapshot(orderId), [orderId]);
+  const lastOrder = useSyncExternalStore(subscribeToConfirmation, getSnapshot, () => null);
+  const order = orders.find((item) => item.id === orderId) ?? lastOrder;
 
-  if (!ready) {
+  if (!ready && !lastOrder) {
     return <div className="mx-auto max-w-3xl px-5 py-24 text-center text-sm text-gray-500">Loading your order…</div>;
   }
 
   if (!order) {
     return (
       <div className="mx-auto max-w-3xl px-5 py-24 text-center">
-        <p className="font-serif text-3xl text-[#111820]">We couldn&apos;t find that order on this device.</p>
-        <p className="mt-3 text-sm text-gray-600">Orders from this demo are stored locally in the browser where they were placed.</p>
+        <p className="font-serif text-3xl text-[#111820]">We couldn&apos;t find that order.</p>
+        <p className="mt-3 text-sm text-gray-600">Use your order number and checkout phone on the track order page to view its latest status.</p>
         <Link href="/shop" className="mt-7 inline-flex rounded-full bg-[#111820] px-7 py-4 text-[10px] uppercase tracking-[0.2em] text-white">Continue shopping</Link>
       </div>
     );
@@ -55,7 +82,7 @@ export default function OrderConfirmation({ orderId }) {
           {deliveryAddress && <p className="mt-2 text-xs text-gray-500">{deliveryAddress}</p>}
           {order.customer.phone && <p className="mt-1 text-xs text-gray-500">Contact: {order.customer.phone}</p>}
         </div>
-        <p className="mt-5 text-xs text-gray-500">Demo order stored in this browser only. No payment has been processed.</p>
+        <p className="mt-5 text-xs text-gray-500">We&apos;ll contact you to confirm delivery. Payment is collected on delivery.</p>
         <Link href="/shop" className="mt-7 inline-flex rounded-full bg-[#111820] px-7 py-4 text-[10px] uppercase tracking-[0.2em] text-white">Continue shopping</Link>
       </div>
     </div>

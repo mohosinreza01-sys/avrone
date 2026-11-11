@@ -9,16 +9,20 @@ import { useStore } from "@/components/store/StoreProvider";
 import ProductCard from "@/components/store/ProductCard";
 
 export default function ProductDetails({ product }) {
-  const { addToCart, wishlist, toggleWishlist } = useStore();
-  const [size, setSize] = useState(product.sizes[0]);
+  const { addToCart, wishlist, toggleWishlist, catalog } = useStore();
+  const hasInventory = Boolean(product.stock && Object.keys(product.stock).length);
+  const availableSizes = product.sizes.filter((item) => Number(product.stock?.[item] ?? 0) > 0);
+  const [size, setSize] = useState(availableSizes[0] ?? product.sizes[0]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const isSaved = wishlist.includes(product.id);
-  const relatedProducts = products
+  const relatedProducts = catalog.length ? catalog : products;
+  const related = relatedProducts
     .filter((item) => item.category === product.category && item.id !== product.id)
     .slice(0, 3);
 
   function handleAdd() {
+    if (hasInventory && !availableSizes.includes(size)) return;
     addToCart(product.id, size, quantity);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
@@ -70,7 +74,8 @@ export default function ProductDetails({ product }) {
                     type="button"
                     onClick={() => setSize(item)}
                     aria-pressed={size === item}
-                    className={`min-w-12 rounded-full border px-4 py-3 text-xs transition ${
+                    disabled={hasInventory && !availableSizes.includes(item)}
+                    className={`min-w-12 rounded-full border px-4 py-3 text-xs transition disabled:cursor-not-allowed disabled:opacity-40 ${
                       size === item
                         ? "border-[#111820] bg-[#111820] text-white"
                         : "border-black/15 bg-white text-[#111820] hover:border-black/50"
@@ -80,6 +85,13 @@ export default function ProductDetails({ product }) {
                   </button>
                 ))}
               </div>
+              {hasInventory && (
+                <p className="mt-3 text-xs text-gray-500">
+                  {availableSizes.length
+                    ? `${product.stock[size] ?? 0} available in size ${size}`
+                    : "Currently out of stock"}
+                </p>
+              )}
             </div>
 
             <div className="mt-7 flex flex-wrap gap-3">
@@ -105,7 +117,8 @@ export default function ProductDetails({ product }) {
               <button
                 type="button"
                 onClick={handleAdd}
-                className="inline-flex min-w-48 flex-1 items-center justify-center gap-2 rounded-full bg-[#111820] px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-white transition hover:bg-[#30363d]"
+                disabled={hasInventory && !availableSizes.includes(size)}
+                className="inline-flex min-w-48 flex-1 items-center justify-center gap-2 rounded-full bg-[#111820] px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-white transition hover:bg-[#30363d] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ShoppingBag size={15} /> {added ? "Added to your bag" : "Add to bag"}
               </button>
@@ -127,7 +140,7 @@ export default function ProductDetails({ product }) {
             </div>
           </div>
         </div>
-        {relatedProducts.length > 0 && (
+        {related.length > 0 && (
           <section className="mt-20">
             <div className="mb-7 flex items-end justify-between">
               <div>
@@ -137,7 +150,7 @@ export default function ProductDetails({ product }) {
               <Link href="/shop" className="text-xs uppercase tracking-[0.16em] underline underline-offset-4">Shop all</Link>
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
-              {relatedProducts.map((item) => <ProductCard key={item.id} product={item} />)}
+              {related.map((item) => <ProductCard key={item.id} product={item} />)}
             </div>
           </section>
         )}

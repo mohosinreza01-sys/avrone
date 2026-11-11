@@ -1,13 +1,10 @@
+import { Suspense } from "react";
 import "./globals.css";
 
 import { Albert_Sans, Inter, Noto_Serif_Bengali } from "next/font/google";
 
-import AnnouncementBar from "@/components/layout/AnnouncementBar";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import MobileShopNav from "@/components/layout/MobileShopNav";
+import SiteChrome from "@/components/layout/SiteChrome";
 import { StoreProvider } from "@/components/store/StoreProvider";
-import FloatingCart from "@/components/store/FloatingCart";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,16 +31,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${albertSans.variable} ${bengaliSerif.variable} antialiased pb-[68px] md:pb-0`}>
+      <body className={`${inter.variable} ${albertSans.variable} ${bengaliSerif.variable} antialiased`}>
         <StoreProvider>
-          <AnnouncementBar />
-          <Navbar />
-
-          <main>{children}</main>
-
-          <FloatingCart />
-          <Footer />
-          <MobileShopNav />
+          <Suspense fallback={children}>
+            <SiteChrome>{children}</SiteChrome>
+          </Suspense>
         </StoreProvider>
       </body>
     </html>

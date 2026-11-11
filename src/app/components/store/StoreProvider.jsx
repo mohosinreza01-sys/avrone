@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { products } from "@/data/products";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 const CART_KEY = "avrone-cart-v1";
 const WISHLIST_KEY = "avrone-wishlist-v1";
 const ORDERS_KEY = "avrone-orders-v1";
-const emptySnapshot = { cart: [], wishlist: [], orders: [] };
+const CATALOG_KEY = "avrone-catalog-v1";
+const emptySnapshot = { cart: [], wishlist: [], orders: [], catalog: products, catalogLoaded: false };
 let snapshot = emptySnapshot;
 let initialized = false;
 const listeners = new Set();
@@ -29,18 +31,27 @@ function readStoredArray(key, isValid) {
 function loadSnapshot() {
   if (typeof window === "undefined" || initialized) return snapshot;
 
+  const savedCatalog = readStoredArray(
+    CATALOG_KEY,
+    (product) =>
+      product &&
+      typeof product.id === "string" &&
+      typeof product.name === "string" &&
+      Array.isArray(product.sizes),
+  );
   snapshot = {
     cart: readStoredArray(
       CART_KEY,
       (item) =>
         item &&
-        products.some((product) => product.id === item.productId && product.sizes.includes(item.size)) &&
+        typeof item.productId === "string" &&
+        typeof item.size === "string" &&
         Number.isInteger(item.quantity) &&
         item.quantity > 0,
     ),
     wishlist: readStoredArray(
       WISHLIST_KEY,
-      (id) => typeof id === "string" && products.some((product) => product.id === id),
+      (id) => typeof id === "string",
     ),
     orders: readStoredArray(
       ORDERS_KEY,
@@ -51,7 +62,10 @@ function loadSnapshot() {
         Array.isArray(order.items) &&
         Number.isFinite(order.total),
     ),
+    catalog: savedCatalog,
+    catalogLoaded: savedCatalog.length > 0,
   };
+  if (!snapshot.catalog.length) snapshot.catalog = products;
   initialized = true;
   return snapshot;
 }
@@ -104,7 +118,7 @@ function updateSnapshot(update) {
 }
 
 function addToCart(productId, size, quantity = 1) {
-  const product = products.find((item) => item.id === productId);
+  const product = loadSnapshot().catalog.find((item) => item.id === productId);
   if (!product || !product.sizes.includes(size) || !Number.isInteger(quantity) || quantity < 1) {
     console.error("Cannot add an invalid product, size, or quantity to the cart.");
     return;
@@ -147,7 +161,7 @@ function removeFromCart(productId, size) {
 }
 
 function toggleWishlist(productId) {
-  if (!products.some((product) => product.id === productId)) return;
+  if (!loadSnapshot().catalog.some((product) => product.id === productId)) return;
   updateSnapshot((current) => ({
     ...current,
     wishlist: current.wishlist.includes(productId)
@@ -156,44 +170,33 @@ function toggleWishlist(productId) {
   }));
 }
 
-function placeOrder(customer) {
-  const current = loadSnapshot();
-  const items = current.cart.flatMap((item) => {
-    const product = products.find((entry) => entry.id === item.productId);
-    return product
-      ? [{
-          productId: product.id,
-          name: product.name,
-          size: item.size,
-          quantity: item.quantity,
-          unitPrice: product.price,
-        }]
-      : [];
-  });
-  if (!items.length) return null;
-
-  const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const shipping = subtotal >= 3000 ? 0 : 150;
-  const order = {
-    id: `AVR-${Date.now().toString(36).toUpperCase()}`,
-    createdAt: new Date().toISOString(),
-    customer,
-    items,
-    subtotal,
-    shipping,
-    total: subtotal + shipping,
-    paymentMethod: "Cash on delivery",
-    status: "Order received",
-  };
-  updateSnapshot((state) => ({
-    ...state,
-    cart: [],
-    orders: [order, ...state.orders],
-  }));
-  return order.id;
-}
-
 export function StoreProvider({ children }) {
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    const controller = new AbortController();
+    fetch("/api/products", { signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not load catalog data.");
+        if (!Array.isArray(data.products)) throw new Error("The catalog response is invalid.");
+        snapshot = { ...loadSnapshot(), catalog: data.products, catalogLoaded: true };
+        initialized = true;
+        try {
+          window.localStorage.setItem(CATALOG_KEY, JSON.stringify(data.products));
+        } catch (error) {
+          console.error("Could not cache the latest catalog in this browser.", error);
+        }
+        notify();
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Could not refresh the product catalog.", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
   return children;
 }
 
@@ -202,10 +205,10 @@ export function useStore() {
   const cartItems = useMemo(
     () =>
       state.cart.flatMap((item) => {
-        const product = products.find((entry) => entry.id === item.productId);
+        const product = state.catalog.find((entry) => entry.id === item.productId);
         return product ? [{ ...item, product }] : [];
       }),
-    [state.cart],
+    [state.cart, state.catalog],
   );
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cartItems.reduce(
@@ -219,11 +222,13 @@ export function useStore() {
     subtotal,
     wishlist: state.wishlist,
     orders: state.orders,
+    catalog: state.catalog,
+    catalogLoaded: state.catalogLoaded,
     ready: initialized,
     addToCart,
     setQuantity,
     removeFromCart,
     toggleWishlist,
-    placeOrder,
+    clearCart: () => updateSnapshot((current) => ({ ...current, cart: [] })),
   };
 }

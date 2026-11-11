@@ -26,7 +26,7 @@ export const products = [
     color: "Soft ivory",
     sizes: ["38", "40", "42", "44", "46"],
     image:
-      "https://images.unsplash.com/photo-1770359993283-a2c2f386584e?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1774527929835-282b1b85cd3a?auto=format&fit=crop&w=1000&q=80",
     description:
       "A breathable cotton Panjabi with understated detailing and a relaxed, comfortable fit for everyday wear.",
   },
@@ -55,7 +55,7 @@ export const products = [
     color: "Midnight blue",
     sizes: ["38", "40", "42", "44", "46"],
     image:
-      "https://images.unsplash.com/photo-1772736243289-872f9ac73cf8?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1770359993283-a2c2f386584e?auto=format&fit=crop&w=1000&q=80",
     description:
       "An easy-to-wear Panjabi with a clean collar and versatile styling, made for relaxed plans and family occasions.",
   },
@@ -70,7 +70,7 @@ export const products = [
     color: "Classic white",
     sizes: ["S", "M", "L", "XL", "XXL"],
     image:
-      "https://images.unsplash.com/photo-1624835567150-0c530a20d8cc?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=1000&q=80",
     description:
       "A versatile cotton shirt with a neat fit and easy styling, suited to workdays, outings, and everyday wear.",
   },
@@ -115,7 +115,7 @@ export const products = [
     color: "Dark brown",
     sizes: ["S", "M", "L", "XL"],
     image:
-      "https://images.unsplash.com/photo-1664286074176-5206ee5dc878?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1711443982852-b3df5c563448?auto=format&fit=crop&w=1000&q=80",
     description:
       "A versatile woven belt with a classic finish, designed to complete everyday and occasion looks.",
   },

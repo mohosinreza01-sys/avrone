@@ -6,8 +6,9 @@ import { products } from "@/data/products";
 import { useStore } from "@/components/store/StoreProvider";
 
 export default function WishlistContent() {
-  const { wishlist } = useStore();
-  const savedProducts = products.filter((product) => wishlist.includes(product.id));
+  const { wishlist, catalog, catalogLoaded } = useStore();
+  const savedProducts = (catalogLoaded ? catalog : products)
+    .filter((product) => wishlist.includes(product.id) && product.active !== false);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-12 md:px-10 lg:px-12">

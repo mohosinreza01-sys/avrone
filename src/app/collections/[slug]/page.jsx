@@ -59,7 +59,11 @@ async function CollectionPageContent({ params }) {
         </section>
       ) : (
         <section className="mx-auto max-w-7xl px-5 py-10 md:px-10 md:py-14 lg:px-12">
-          <ProductBrowser products={collectionProducts} initialCategory={category ?? "All"} />
+          <ProductBrowser
+            products={collectionProducts}
+            initialCategory={category ?? "All"}
+            categoryFilter={parentCategory?.productCategories ?? (category ? [category] : null)}
+          />
         </section>
       )}
     </div>

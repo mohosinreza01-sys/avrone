@@ -12,11 +12,12 @@ const SHIPPING_FEE = 150;
 
 export default function CheckoutForm() {
   const router = useRouter();
-  const { cartItems, subtotal, placeOrder } = useStore();
+  const { cartItems, subtotal, clearCart } = useStore();
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     const formData = new FormData(event.currentTarget);
@@ -31,12 +32,58 @@ export default function CheckoutForm() {
       setError("Enter your full name and a complete delivery address.");
       return;
     }
-    const orderId = placeOrder(customer);
-    if (!orderId) {
+    if (!cartItems.length) {
       setError("Your bag is empty. Add an item before checking out.");
       return;
     }
-    router.push(`/order-confirmation?orderId=${encodeURIComponent(orderId)}`);
+
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer,
+          items: cartItems.map(({ product, size, quantity }) => ({
+            productId: product.id,
+            size,
+            quantity,
+          })),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Your order could not be placed.");
+
+      const order = data.order;
+      const confirmation = {
+        id: order.order_number,
+        createdAt: new Date().toISOString(),
+        customer: {
+          name: order.customer_name,
+          phone: order.customer_phone,
+          address: order.customer_address,
+        },
+        items: order.items.map((item) => ({
+          productId: item.product_id,
+          name: item.product_name,
+          size: item.size,
+          quantity: item.quantity,
+          unitPrice: item.unit_price,
+        })),
+        subtotal: order.subtotal,
+        shipping: order.delivery_fee,
+        total: order.total,
+        paymentMethod: order.payment_method,
+        status: order.status,
+      };
+      window.sessionStorage.setItem("avrone-last-order", JSON.stringify(confirmation));
+      clearCart();
+      router.push(`/order-confirmation?orderId=${encodeURIComponent(order.order_number)}`);
+    } catch (orderError) {
+      setError(orderError.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (!cartItems.length) {
@@ -102,8 +149,8 @@ export default function CheckoutForm() {
             <div className="flex justify-between border-t border-white/15 pt-4 text-base font-medium"><span>Total</span><span>{formatPrice(subtotal + shipping)}</span></div>
           </div>
           {error && <p role="alert" className="mt-4 rounded-lg bg-red-950/60 p-3 text-sm text-red-100">{error}</p>}
-          <button type="submit" className="mt-6 w-full rounded-full bg-white px-5 py-4 text-[10px] uppercase tracking-[0.2em] text-[#111820] transition hover:bg-gray-200">Place order · {formatPrice(subtotal + shipping)}</button>
-          <p className="mt-4 text-center text-[10px] leading-5 text-gray-400">Demo storefront: order details are saved in this browser only.</p>
+          <button type="submit" disabled={submitting} className="mt-6 w-full rounded-full bg-white px-5 py-4 text-[10px] uppercase tracking-[0.2em] text-[#111820] transition hover:bg-gray-200 disabled:cursor-wait disabled:opacity-60">{submitting ? "Placing order..." : `Place order · ${formatPrice(subtotal + shipping)}`}</button>
+          <p className="mt-4 text-center text-[10px] leading-5 text-gray-400">Cash on delivery · We&apos;ll call to confirm your order.</p>
         </aside>
       </form>
     </div>

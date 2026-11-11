@@ -104,16 +104,16 @@ export default function Navbar() {
           {menuOpen ? <X size={21} /> : <Menu size={21} />}
         </button>
 
-        <Link href="/" onClick={closeMenus} className="flex shrink-0 flex-col items-center lg:items-start">
+        <Link href="/" onClick={closeMenus} className="flex shrink-0 flex-col items-center lg:relative lg:h-full lg:w-[126px] lg:translate-x-4 lg:justify-center">
           <Image
             src="/images/avrone-logo.png"
             alt="AVRONE"
             width={681}
             height={277}
             priority
-            className="h-[40px] w-[98px] object-contain sm:h-[43px] sm:w-[106px] lg:h-[48px] lg:w-[118px]"
+            className="h-[40px] w-[98px] object-contain sm:h-[43px] sm:w-[106px] lg:absolute lg:left-0 lg:top-1/2 lg:h-[46px] lg:w-[113px] lg:-translate-y-1/2"
           />
-          <span className="text-[7px] tracking-[0.55em] text-[#657d78] sm:text-[8px]">LIFESTYLE</span>
+          <span className="text-[7px] tracking-[0.55em] text-[#657d78] sm:text-[8px] lg:absolute lg:bottom-0 lg:left-0 lg:w-full lg:text-center">LIFESTYLE</span>
         </Link>
 
         <form onSubmit={submitSearch} className="mx-auto hidden w-full max-w-[520px] lg:flex">
@@ -126,9 +126,9 @@ export default function Navbar() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search for products..."
-              className="min-w-0 flex-1 bg-transparent px-3 text-xs outline-none placeholder:text-[#8d9690]"
+              className="min-w-0 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-[#8d9690]"
             />
-            <button type="submit" className="flex h-9 items-center gap-2 rounded-full bg-[#173d38] px-4 text-[9px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-[#245b53]">
+            <button type="submit" className="flex h-9 items-center gap-2 rounded-full bg-[#173d38] px-4 text-[10px] font-medium uppercase tracking-[0.1em] text-white transition hover:bg-[#245b53]">
               Search
             </button>
           </div>
@@ -183,23 +183,23 @@ export default function Navbar() {
               onClick={() => setCategoryMenuOpen((open) => !open)}
               aria-expanded={categoryMenuOpen}
               aria-controls="desktop-category-menu"
-              className={`flex h-full items-center gap-2.5 border-b-2 px-4 text-[10px] font-medium uppercase tracking-[0.13em] transition ${categoryMenuOpen ? "border-[#b99458] bg-[#f7f4ed] text-[#173d38]" : "border-transparent text-[#173d38] hover:bg-[#f7f4ed]"}`}
+              className={`flex h-full items-center gap-2.5 border-b-2 px-4 text-[11px] font-medium uppercase tracking-[0.1em] transition ${categoryMenuOpen ? "border-[#b99458] bg-[#f7f4ed] text-[#173d38]" : "border-transparent text-[#173d38] hover:bg-[#f7f4ed]"}`}
             >
               <Grid2X2 size={16} strokeWidth={1.7} />
               Shop by category
               <ChevronDown size={14} className={`transition-transform ${categoryMenuOpen ? "rotate-180" : ""}`} />
             </button>
           </div>
-          <Link href="/" className={`text-[10px] uppercase tracking-[0.13em] transition hover:text-[#a98a52] ${pathname === "/" ? "font-semibold text-[#173d38]" : "text-[#52665f]"}`}>Home</Link>
+          <Link href="/" className={`text-[11px] uppercase tracking-[0.1em] transition hover:text-[#a98a52] ${pathname === "/" ? "font-semibold text-[#173d38]" : "text-[#52665f]"}`}>Home</Link>
           <span aria-hidden="true" className="h-4 w-px bg-[#e7e0d4]" />
           <div className="flex min-w-0 flex-1 items-center gap-6">
             {featuredNavigation.map((item) => (
-              <Link key={item.name} href={item.href} className={`whitespace-nowrap text-[9px] uppercase tracking-[0.13em] transition hover:text-[#a98a52] ${item.sale ? "font-semibold text-[#a34c3b]" : "text-[#52665f]"}`}>
+              <Link key={item.name} href={item.href} className={`whitespace-nowrap text-[10px] uppercase tracking-[0.1em] transition hover:text-[#a98a52] ${item.sale ? "font-semibold text-[#a34c3b]" : "text-[#52665f]"}`}>
                 {item.name}
               </Link>
             ))}
           </div>
-          <Link href="/collections" className="ml-auto inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.13em] text-[#52665f] transition hover:text-[#a98a52]">
+          <Link href="/collections" className="ml-auto inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.1em] text-[#52665f] transition hover:text-[#a98a52]">
             All collections <ArrowUpRight size={13} />
           </Link>
         </div>
